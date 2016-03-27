@@ -62,7 +62,121 @@ Proof.
       assumption.
 Qed.
 
+Theorem sub_diag : forall n,
+  sub n n = 0.
+Proof.
+  intros n. induction n as [| n'].
+  Case "n = 0".
+    simpl. reflexivity.
+  Case "n = S n'".
+    simpl. rewrite -> IHn'. reflexivity.
+Qed.
 
+Theorem plus_swap : forall n m p : nat, 
+  n + (m + p) = m + (n + p).
+Proof.
+  intros n m p.
+  rewrite plus_assoc.
+  symmetry.
+  rewrite plus_assoc.
+  assert (H: m + n = n + m).
+    rewrite plus_comm.
+    reflexivity.
+  rewrite H.
+  reflexivity.
+Qed.
+
+Theorem mult_0_r: forall m : nat, m * 0 = 0.
+Proof.
+  intros m.
+  induction m as [|m'].
+  Case "m = 0".
+    rewrite mult_0_l.
+    reflexivity.
+  Case "m = S m'".
+    simpl.
+    assumption.
+Qed.
+
+Theorem add_eq_l : forall m n o : nat, m = n -> m + o = n + o.
+Proof.
+  intros m n o H.
+  rewrite H.
+  reflexivity.
+Qed.
+
+Theorem add_eq_r : forall m n o : nat, m = n -> o + m = o + n.
+Proof.
+  intros m n o H.
+  rewrite H.
+  reflexivity.
+Qed.
+
+Lemma plus_unassoc : forall n m o : nat, (n + m) + o = n + (m + o).
+Proof.
+  symmetry.
+  rewrite plus_assoc.
+  reflexivity.
+Qed.
+
+Theorem mult_dist_l : forall m n o: nat, m * (n + o) = (m * n) + (m * o).
+Proof.
+  intros m n o.
+  induction m as [|m'].
+  Case "m = 0".
+    rewrite mult_0_l.
+    rewrite mult_0_l.
+    rewrite mult_0_l.
+    symmetry.
+    rewrite plus_0_l.
+    reflexivity.
+  Case "m = S m'".
+    simpl.
+    rewrite IHm'.
+    remember (m' * n) as a.
+    remember (m' * o) as b.
+    rewrite plus_assoc.
+    symmetry.
+    rewrite plus_assoc.
+    rewrite plus_comm.
+    symmetry.
+    rewrite plus_comm.
+    assert (H: n + o + a = n + a + o).
+      rewrite plus_unassoc.
+      symmetry.
+      rewrite plus_unassoc.
+      assert (H2: a + o = o + a).
+        rewrite plus_comm.
+        reflexivity.
+      rewrite H2.
+      reflexivity.
+    rewrite H.
+    reflexivity.
+Qed.
+
+Theorem mult_dist_r : forall m n o: nat, (n + o) * m = (n * m) + (o * m).
+Proof.
+  intros m n o.
+  induction m as [|m'].
+  Case "m = 0".
+    rewrite mult_0_r.
+    rewrite mult_0_r.
+    rewrite mult_0_r.
+    reflexivity.
+  Case "m = S m'".
+Admitted.
+
+Theorem mult_comm : forall m n : nat,
+ m * n = n * m.
+Proof.
+  intros m n.
+  induction m as [|m'].
+  Case "m = 0".
+    rewrite mult_0_l.
+    rewrite mult_0_r.
+    reflexivity.
+  Case "m = S m'".
+Admitted.
 
 
 
