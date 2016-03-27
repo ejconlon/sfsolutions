@@ -448,9 +448,18 @@ Proof.
 Qed.
 
 Definition fold_map {X Y:Type} (f : X -> Y) (l : list X) : list Y :=
-  rev (fold (fun elem acc => f elem :: acc) l []).
+  fold (fun elem acc => f elem :: acc) l [].
 
-(* Theorem foldfold_map f (n :: l') = f n :: fold_map f l' *)
+Example test_fold_map1: fold_map (plus 3) [2;0;2] = [5;3;5].
+Proof. reflexivity.  Qed.
+
+Example test_fold_map2: fold_map oddb [2;1;2;5] = [false;true;false;true].
+Proof. reflexivity. Qed.
+
+Example test_fold_map3:
+   fold_map (fun n => [evenb n;oddb n]) [2;1;2;5]
+  = [[true;false];[false;true];[true;false];[false;true]].
+Proof. reflexivity.  Qed.
 
 Theorem fold_map_eq: forall (X Y : Type) (f : X -> Y) (l : list X),
   fold_map f l = map f l.
@@ -459,18 +468,6 @@ Proof.
   reflexivity.
   simpl.
   rewrite <- IHl'.
-  unfold fold_map.
-  simpl.
-  remember (fold (fun (elem : X) (acc : list Y) => f elem :: acc)
-        l' [ ]) as b.
-
-  unfold snoc.
-
-(** Write down a theorem in Coq stating that [fold_map] is correct,
-    and prove it. *)
-
-(* FILL IN HERE *)
-(** [] *)
-
-(* $Date: 2013-09-26 14:40:26 -0400 (Thu, 26 Sep 2013) $ *)
+  reflexivity.
+Qed.
 
