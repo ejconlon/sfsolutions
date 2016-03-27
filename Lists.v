@@ -142,21 +142,24 @@ Fixpoint oddmembers (l:natlist) : natlist :=
 Example test_oddmembers:            oddmembers [0;1;0;2;3;0;0] = [1;3].
 Proof. reflexivity. Qed.
 
-Fixpoint subreverse (l y : natlist) : natlist :=
+Fixpoint snoc (l:natlist) (v:nat) : natlist := 
   match l with
-  | [] => y
-  | x :: xs => subreverse xs (x :: y)
+  | nil    => [v]
+  | h :: t => h :: (snoc t v)
   end.
 
-Definition reverse (l:natlist) : natlist :=
-  subreverse l [].
+Fixpoint rev (l:natlist) : natlist := 
+  match l with
+  | nil    => nil
+  | h :: t => snoc (rev t) h
+  end.
 
 Fixpoint subalternate (n : nat) (ys l1 l2 : natlist) : natlist :=
   match n with
-  | 0 => reverse ys
+  | 0 => rev ys
   | S n' =>
     match l1 with
-    | [] => (reverse ys) ++ l2
+    | [] => (rev ys) ++ l2
     | x :: xs => subalternate n' (x :: ys) l2 xs
     end
   end.
@@ -211,12 +214,44 @@ Proof.
   reflexivity.
 Qed.
 
+Theorem app_length : forall l1 l2 : natlist, 
+  length (l1 ++ l2) = (length l1) + (length l2).
+Proof.
+  intros.
+  induction l1 as [| n l1'].
+  reflexivity.
+  simpl.
+  rewrite IHl1'.
+  reflexivity.
+Qed.
 
+Example test_rev1:            rev [1;2;3] = [3;2;1].
+Proof. reflexivity.  Qed.
+Example test_rev2:            rev nil = nil.
+Proof. reflexivity.  Qed.
 
+Theorem length_snoc : forall n : nat, forall l : natlist,
+  length (snoc l n) = S (length l).
+Proof.
+  intros.
+  induction l as [| n' l'].
+  reflexivity.
+  simpl.
+  rewrite IHl'.
+  reflexivity.
+Qed.
 
+Theorem rev_length : forall l : natlist,
+  length (rev l) = length l.
+Proof.
+  intros.
+  induction l as [| n l'].
+  reflexivity.
+  simpl.
+  rewrite length_snoc.
+  rewrite IHl'.
+  reflexivity.
+Qed.
 
-
-
-
-
+(* SearchAbout rev. *)
 
