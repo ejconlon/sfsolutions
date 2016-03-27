@@ -356,23 +356,6 @@ Fixpoint fold {X Y:Type} (f: X->Y->Y) (l:list X) (b:Y) : Y :=
   | h :: t => f h (fold f t b)
   end.
 
-(** *** *)
-
-(** Intuitively, the behavior of the [fold] operation is to
-    insert a given binary operator [f] between every pair of elements
-    in a given list.  For example, [ fold plus [1;2;3;4] ] intuitively
-    means [1+2+3+4].  To make this precise, we also need a "starting
-    element" that serves as the initial second input to [f].  So, for
-    example,
-   fold plus [1;2;3;4] 0
-    yields
-   1 + (2 + (3 + (4 + 0))).
-    Here are some more examples:
-*)
-
-Check (fold andb).
-(* ===> fold andb : list bool -> bool -> bool *)
-
 Example fold_example1 : fold mult [1;2;3;4] 1 = 24.
 Proof. reflexivity. Qed.
 
@@ -381,26 +364,6 @@ Proof. reflexivity. Qed.
 
 Example fold_example3 : fold app  [[1];[];[2;3];[4]] [] = [1;2;3;4].
 Proof. reflexivity. Qed.
-
-
-(** **** Exercise: 1 star, advanced (fold_types_different) *)
-(** Observe that the type of [fold] is parameterized by _two_ type
-    variables, [X] and [Y], and the parameter [f] is a binary operator
-    that takes an [X] and a [Y] and returns a [Y].  Can you think of a
-    situation where it would be useful for [X] and [Y] to be
-    different? *)
-
-(* ###################################################### *)
-(** ** Functions For Constructing Functions *)
-
-(** Most of the higher-order functions we have talked about so
-    far take functions as _arguments_.  Now let's look at some
-    examples involving _returning_ functions as the results of other
-    functions.
-
-    To begin, here is a function that takes a value [x] (drawn from
-    some type [X]) and returns a function from [nat] to [X] that
-    yields [x] whenever it is called, ignoring its [nat] argument. *)
 
 Definition constfun {X: Type} (x: X) : nat->X :=
   fun (k:nat) => x.
@@ -413,23 +376,10 @@ Proof. reflexivity. Qed.
 Example constfun_example2 : (constfun 5) 99 = 5.
 Proof. reflexivity. Qed.
 
-(** *** *)
-(** Similarly, but a bit more interestingly, here is a function
-    that takes a function [f] from numbers to some type [X], a number
-    [k], and a value [x], and constructs a function that behaves
-    exactly like [f] except that, when called with the argument [k],
-    it returns [x]. *)
-
 Definition override {X: Type} (f: nat->X) (k:nat) (x:X) : nat->X:=
   fun (k':nat) => if beq_nat k k' then x else f k'.
 
-(** For example, we can apply [override] twice to obtain a
-    function from numbers to booleans that returns [false] on [1] and
-    [3] and returns [true] on all other arguments. *)
-
 Definition fmostlytrue := override (override ftrue 1 false) 3 false.
-
-(** *** *)
 
 Example override_example1 : fmostlytrue 0 = true.
 Proof. reflexivity. Qed.
@@ -443,52 +393,9 @@ Proof. reflexivity. Qed.
 Example override_example4 : fmostlytrue 3 = false.
 Proof. reflexivity. Qed.
 
-(** *** *)
-
-(** **** Exercise: 1 star (override_example) *)
-(** Before starting to work on the following proof, make sure you
-    understand exactly what the theorem is saying and can paraphrase
-    it in your own words.  The proof itself is straightforward. *)
-
 Theorem override_example : forall (b:bool),
   (override (constfun b) 3 true) 2 = b.
-Proof.
-  (* FILL IN HERE *) Admitted.
-(** [] *)
-
-(** We'll use function overriding heavily in parts of the rest of the
-    course, and we will end up needing to know quite a bit about its
-    properties.  To prove these properties, though, we need to know
-    about a few more of Coq's tactics; developing these is the main
-    topic of the next chapter.  For now, though, let's introduce just
-    one very useful tactic that will also help us with proving
-    properties of some of the other functions we have introduced in
-    this chapter. *)
-
-(* ###################################################### *)
-
-(* ###################################################### *)
-(** * The [unfold] Tactic *)
-
-(** Sometimes, a proof will get stuck because Coq doesn't
-    automatically expand a function call into its definition.  (This
-    is a feature, not a bug: if Coq automatically expanded everything
-    possible, our proof goals would quickly become enormous -- hard to
-    read and slow for Coq to manipulate!) *)
-
-Theorem unfold_example_bad : forall m n,
-  3 + n = m ->
-  plus3 n + 1 = m + 1.
-Proof.
-  intros m n H.
-(* At this point, we'd like to do [rewrite -> H], since 
-     [plus3 n] is definitionally equal to [3 + n].  However, 
-     Coq doesn't automatically expand [plus3 n] to its 
-     definition. *)
-  Abort.
-
-(** The [unfold] tactic can be used to explicitly replace a
-    defined name by the right-hand side of its definition.  *)
+Proof. reflexivity. Qed.
 
 Theorem unfold_example : forall m n,
   3 + n = m ->
@@ -499,40 +406,27 @@ Proof.
   rewrite -> H.
   reflexivity.  Qed.
 
-(** Now we can prove a first property of [override]: If we
-    override a function at some argument [k] and then look up [k], we
-    get back the overridden value. *)
+Theorem beq_nat_refl : forall n : nat, beq_nat n n = true.
+Proof. intros. induction n as [| n']. reflexivity. simpl. rewrite IHn'. reflexivity. Qed.
 
 Theorem override_eq : forall {X:Type} x k (f:nat->X),
   (override f k x) k = x.
 Proof.
   intros X x k f.
   unfold override.
-  rewrite <- beq_nat_refl.
+  rewrite beq_nat_refl.
   reflexivity.  Qed.
 
-(** This proof was straightforward, but note that it requires
-    [unfold] to expand the definition of [override]. *)
-
-(** **** Exercise: 2 stars (override_neq) *)
 Theorem override_neq : forall (X:Type) x1 x2 k1 k2 (f : nat->X),
   f k1 = x1 ->
   beq_nat k2 k1 = false ->
   (override f k2 x2) k1 = x1.
 Proof.
-  (* FILL IN HERE *) Admitted.
-(** [] *)
-
-(** As the inverse of [unfold], Coq also provides a tactic
-    [fold], which can be used to "unexpand" a definition.  It is used
-    much less often. *)
-
-(* ##################################################### *)
-(** * Additional Exercises *)
-
-(** **** Exercise: 2 stars (fold_length) *)
-(** Many common functions on lists can be implemented in terms of
-   [fold].  For example, here is an alternative definition of [length]: *)
+  intros.
+  unfold override.
+  rewrite H0.
+  assumption.
+Qed.
 
 Definition fold_length {X : Type} (l : list X) : nat :=
   fold (fun _ n => S n) l 0.
@@ -544,15 +438,33 @@ Proof. reflexivity. Qed.
 
 Theorem fold_length_correct : forall X (l : list X),
   fold_length l = length l.
-(* FILL IN HERE *) Admitted. 
-(** [] *)
-
-(** **** Exercise: 3 stars (fold_map) *)
-(** We can also define [map] in terms of [fold].  Finish [fold_map]
-    below. *)
+Proof.
+  intros.
+  induction l as [|n l'].
+  reflexivity.
+  simpl.
+  rewrite <- IHl'.
+  reflexivity.
+Qed.
 
 Definition fold_map {X Y:Type} (f : X -> Y) (l : list X) : list Y :=
-(* FILL IN HERE *) admit.
+  rev (fold (fun elem acc => f elem :: acc) l []).
+
+(* Theorem foldfold_map f (n :: l') = f n :: fold_map f l' *)
+
+Theorem fold_map_eq: forall (X Y : Type) (f : X -> Y) (l : list X),
+  fold_map f l = map f l.
+Proof.
+  intros. induction l as [|n l'].
+  reflexivity.
+  simpl.
+  rewrite <- IHl'.
+  unfold fold_map.
+  simpl.
+  remember (fold (fun (elem : X) (acc : list Y) => f elem :: acc)
+        l' [ ]) as b.
+
+  unfold snoc.
 
 (** Write down a theorem in Coq stating that [fold_map] is correct,
     and prove it. *)
