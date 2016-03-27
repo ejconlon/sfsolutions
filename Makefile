@@ -1,3 +1,7 @@
+.PHONY: clean all
+
+clean:
+	rm -f .*.aux *.glob *.vo
 
 all: Basics.vo Induction.vo
 
