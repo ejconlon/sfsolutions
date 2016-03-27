@@ -154,7 +154,7 @@ Proof. reflexivity. Qed.
 Notation "x + y" := (plus x y)
                        (at level 50, left associativity)
                        : nat_scope.
-Notation "x - y" := (minus x y)
+Notation "x - y" := (sub x y)
                        (at level 50, left associativity)
                        : nat_scope.
 Notation "x * y" := (mult x y)

@@ -50,8 +50,17 @@ Proof.
   destruct b.
   Case "b = true".
     rewrite andb_t_l.
-  intro H.
-  assumption.
+    intros H.
+    assumption.
+  Case "b = false".
+    rewrite andb_f_l.
+    intros H.
+    destruct c.
+    SCase "c = true".
+      reflexivity.
+    SCase "c = false".
+      assumption.
+Qed.
 
 
 
