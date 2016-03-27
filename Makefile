@@ -3,7 +3,7 @@
 clean:
 	rm -f .*.aux *.glob *.vo
 
-all: Basics.vo Induction.vo Lists.vo Poly.vo
+all: Basics.vo Induction.vo Lists.vo Poly.vo MoreCoq.vo
 
 Basics.vo:
 	coqc Basics.v
@@ -16,4 +16,7 @@ Lists.vo: Induction.vo
 
 Poly.vo: Lists.vo
 	coqc Poly.v
+
+MoreCoq.vo: Poly.vo
+	coqc MoreCoq.v
 
