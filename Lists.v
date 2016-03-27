@@ -253,5 +253,42 @@ Proof.
   reflexivity.
 Qed.
 
+Theorem absorb_snoc : forall n m: nat, forall l : natlist, n :: (snoc l m) = snoc (n :: l) m.
+Proof.
+  intros.
+  reflexivity.
+Qed.
+
 (* SearchAbout rev. *)
+
+Theorem rev_snoc : forall n : nat, forall l : natlist, rev (snoc l n) = n :: rev l.
+Proof.
+  intros.
+  induction l as [| n' l'].
+  reflexivity.
+  simpl.
+  rewrite absorb_snoc.
+  rewrite IHl'.
+  reflexivity.
+Qed.
+
+Theorem rev_involutive : forall l : natlist, rev (rev l) = l.
+Proof.
+  intros. induction l as [| n l'].
+  reflexivity.
+  simpl.
+  rewrite rev_snoc.
+  rewrite IHl'.
+  reflexivity.
+Qed.
+
+(* Theorem cons_append : forall n : nat, forall l : natlist, cons n l = [n] ++ l.
+ *)
+
+
+
+
+
+
+
 
