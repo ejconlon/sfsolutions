@@ -287,11 +287,6 @@ Proof. reflexivity. Qed.
 Example test_partition2: partition (fun x => false) [5;9;0] = ([], [5;9;0]).
 Proof. reflexivity. Qed.
 
-(* ###################################################### *)
-(** ** Map *)
-
-(** Another handy higher-order function is called [map]. *)
-
 Fixpoint map {X Y:Type} (f:X->Y) (l:list X)
              : (list Y) :=
   match l with
@@ -299,68 +294,54 @@ Fixpoint map {X Y:Type} (f:X->Y) (l:list X)
   | h :: t => (f h) :: (map f t)
   end.
 
-(** *** *)
-(** It takes a function [f] and a list [ l = [n1, n2, n3, ...] ]
-    and returns the list [ [f n1, f n2, f n3,...] ], where [f] has
-    been applied to each element of [l] in turn.  For example: *)
-
 Example test_map1: map (plus 3) [2;0;2] = [5;3;5].
 Proof. reflexivity.  Qed.
 
-(** The element types of the input and output lists need not be
-    the same ([map] takes _two_ type arguments, [X] and [Y]).  This
-    version of [map] can thus be applied to a list of numbers and a
-    function from numbers to booleans to yield a list of booleans: *)
-
 Example test_map2: map oddb [2;1;2;5] = [false;true;false;true].
 Proof. reflexivity.  Qed.
-
-(** It can even be applied to a list of numbers and
-    a function from numbers to _lists_ of booleans to
-    yield a list of lists of booleans: *)
 
 Example test_map3:
     map (fun n => [evenb n;oddb n]) [2;1;2;5]
   = [[true;false];[false;true];[true;false];[false;true]].
 Proof. reflexivity.  Qed.
 
-
+Theorem map_snoc: forall (X Y : Type) (f : X -> Y) (l : list X) (v : X),
+  map f (snoc l v) = snoc (map f l) (f v).
+Proof.
+  intros.
+  induction l as [|w m].
+  reflexivity.
+  simpl.
+  rewrite IHm.
+  reflexivity.
+Qed.
 
 (** ** Map for options *)
 (** **** Exercise: 3 stars (map_rev) *)
 (** Show that [map] and [rev] commute.  You may need to define an
     auxiliary lemma. *)
-
-
-Theorem map_rev : forall (X Y : Type) (f : X -> Y) (l : list X),
-  map f (rev l) = rev (map f l).
+Theorem map_rev: forall (X Y : Type) (f : X -> Y) (l : list X), map f (rev l) = rev (map f l).
 Proof.
-  (* FILL IN HERE *) Admitted.
-(** [] *)
-
-(** **** Exercise: 2 stars (flat_map) *)
-(** The function [map] maps a [list X] to a [list Y] using a function
-    of type [X -> Y].  We can define a similar function, [flat_map],
-    which maps a [list X] to a [list Y] using a function [f] of type
-    [X -> list Y].  Your definition should work by 'flattening' the
-    results of [f], like so:
-        flat_map (fun n => [n;n+1;n+2]) [1;5;10]
-      = [1; 2; 3; 5; 6; 7; 10; 11; 12].
-*)
+  intros.
+  induction l as [|v m].
+  reflexivity.
+  simpl.
+  rewrite <- IHm.
+  rewrite map_snoc.
+  reflexivity.
+Qed.
 
 Fixpoint flat_map {X Y:Type} (f:X -> list Y) (l:list X)
                    : (list Y) :=
-  (* FILL IN HERE *) admit.
+  match l with
+  | [] => []
+  | x :: xs => f x ++ flat_map f xs
+  end.
 
 Example test_flat_map1:
   flat_map (fun n => [n;n;n]) [1;5;4]
   = [1; 1; 1; 5; 5; 5; 4; 4; 4].
- (* FILL IN HERE *) Admitted.
-(** [] *)
-
-(** Lists are not the only inductive type that we can write a
-    [map] function for.  Here is the definition of [map] for the
-    [option] type: *)
+Proof. reflexivity. Qed.
 
 Definition option_map {X Y : Type} (f : X -> Y) (xo : option X)
                       : option Y :=
@@ -368,23 +349,6 @@ Definition option_map {X Y : Type} (f : X -> Y) (xo : option X)
     | None => None
     | Some x => Some (f x)
   end.
-
-(** **** Exercise: 2 stars, optional (implicit_args) *)
-(** The definitions and uses of [filter] and [map] use implicit
-    arguments in many places.  Replace the curly braces around the
-    implicit arguments with parentheses, and then fill in explicit
-    type parameters where necessary and use Coq to check that you've
-    done so correctly.  (This exercise is not to be turned in; it is
-    probably easiest to do it on a _copy_ of this file that you can
-    throw away afterwards.)  [] *)
-
-(* ###################################################### *)
-(** ** Fold *)
-
-(** An even more powerful higher-order function is called
-    [fold].  This function is the inspiration for the "[reduce]"
-    operation that lies at the heart of Google's map/reduce
-    distributed programming framework. *)
 
 Fixpoint fold {X Y:Type} (f: X->Y->Y) (l:list X) (b:Y) : Y :=
   match l with
