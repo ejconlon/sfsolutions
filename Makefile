@@ -1,4 +1,6 @@
 
+all: Basics.vo Induction.vo
+
 Basics.vo:
 	coqc Basics.v
 
