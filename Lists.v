@@ -322,10 +322,4 @@ Proof.
   assumption.
 Qed.
 
-
-
-
-
-
-
-
+End NatList.
