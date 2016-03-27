@@ -13,7 +13,7 @@ Definition next_weekday (d:day) : day :=
   | wednesday => monday
   end.
 
-Eval compute in (next_weekday monday).
+(*Eval compute in (next_weekday monday).*)
 
 Example test_next_weekday:
   (next_weekday (next_weekday tuesday)) = monday.
@@ -32,13 +32,13 @@ Definition negb (b : bool) : bool :=
   | false => true
   end.
 
-Definition andb (b1:bool) (b2:bool) : bool := 
+Definition andb (b1:bool) (b2:bool) : bool :=
   match b1 with
   | true => b2
   | false => false
   end.
 
-Definition orb (b1:bool) (b2:bool) : bool := 
+Definition orb (b1:bool) (b2:bool) : bool :=
   match b1 with
   | true => true
   | false => b2
@@ -102,12 +102,13 @@ Proof.
   reflexivity.
 Qed.
 
+(*
 Check true.
 
 Check (negb true).
 
 Check test_andb34.
-
+*)
 
 Fixpoint evenb (n:nat) : bool :=
   match n with
@@ -122,7 +123,6 @@ Example test_oddb1: (oddb (S O)) = true.
 Proof. reflexivity. Qed.
 Example test_oddb2: (oddb (S (S (S (S O))))) = false.
 Proof. reflexivity. Qed.
-
 
 Fixpoint plus (n : nat) (m : nat) : nat :=
   match n with
@@ -149,19 +149,19 @@ Proof. reflexivity. Qed.
 Example sub_zero: sub 3 5 = 0.
 Proof. reflexivity. Qed.
 
-Eval compute in (plus (S (S (S O))) (S (S O))).
+(* Eval compute in (plus (S (S (S O))) (S (S O))). *)
 
-Notation "x + y" := (plus x y) 
-                       (at level 50, left associativity) 
+Notation "x + y" := (plus x y)
+                       (at level 50, left associativity)
                        : nat_scope.
-Notation "x - y" := (minus x y) 
-                       (at level 50, left associativity) 
+Notation "x - y" := (minus x y)
+                       (at level 50, left associativity)
                        : nat_scope.
 Notation "x * y" := (mult x y)
-                       (at level 40, left associativity) 
+                       (at level 40, left associativity)
                        : nat_scope.
 
-Check ((0 + 1) + 1).
+(* Check ((0 + 1) + 1). *)
 
 Fixpoint ble_nat (n m : nat) : bool :=
   match n with
@@ -192,10 +192,8 @@ Fixpoint beq_nat (n m : nat) : bool :=
             end
   end.
 
-
 Definition blt_nat (n m : nat) : bool :=
   andb (ble_nat n m) (negb (beq_nat n m)).
-
 
 Example test_blt_nat1:             (blt_nat 2 2) = false.
 Proof. reflexivity.  Qed.
@@ -206,25 +204,13 @@ Proof. reflexivity.  Qed.
 Example test_blt_nat3:             (blt_nat 4 2) = false.
 Proof. reflexivity.  Qed.
 
-
 Fixpoint mult (n m : nat) : nat :=
   match n with
     | O => O
     | S n' => plus m (mult n' m)
   end.
 
-(*
-Fixpoint subdiv (n m a : nat) : nat :=
-  match sub n m with
-    | O => a
-    | n' => subdiv n' m (a + 1)
-  end.
-
-Definition div (n m : nat) : nat :=
-  subdiv n m 0.
-*)
-
-Fixpoint factorial (n:nat) : nat := 
+Fixpoint factorial (n:nat) : nat :=
   match n with
   | O => S O
   | S n' => mult n (factorial n')
@@ -236,7 +222,6 @@ Proof. simpl. reflexivity. Qed.
 Example test_factorial2: (factorial 5) = (mult 10 12).
 Proof. simpl. reflexivity. Qed.
 
-
 Theorem plus_O_n : forall n : nat, 0 + n = n.
 Proof.
   intros n.
@@ -244,7 +229,7 @@ Proof.
 Qed.
 
 Theorem plus_id_example : forall n m:nat,
-  n = m -> 
+  n = m ->
   n + n = m + m.
 Proof.
   intros n m.
@@ -253,7 +238,7 @@ Proof.
   reflexivity.
 Qed.
 
-Theorem plus_1_l : forall n:nat, 1 + n = S n. 
+Theorem plus_1_l : forall n:nat, 1 + n = S n.
 Proof.
   intros n. reflexivity.  Qed.
 
@@ -279,7 +264,7 @@ Proof.
   reflexivity.  Qed.
 
 Theorem mult_S_1 : forall n m : nat,
-  m = S n -> 
+  m = S n ->
   m * (1 + n) = m * m.
 Proof.
   intros n m.
@@ -306,8 +291,8 @@ Proof.
   reflexivity.
 Qed.
 
-Theorem identity_fn_applied_twice : 
-  forall (f : bool -> bool), 
+Theorem identity_fn_applied_twice :
+  forall (f : bool -> bool),
   (forall (x : bool), f x = x) ->
   forall (b : bool), f (f b) = b.
 Proof.
@@ -373,7 +358,7 @@ Proof.
   reflexivity.
 Qed.
 
-Theorem andb_eq_orb : 
+Theorem andb_eq_orb :
   forall (b c : bool),
   (andb b c = orb b c) ->
   b = c.
@@ -518,13 +503,6 @@ Proof.
   reflexivity.
 Qed.
 
-(* Lemma incr_bin: forall (n : nat), bin_to_nat (bin_incr (nat_to_bin n)) = S n.
-Proof.
-  intros n.
-  induction n.
-  reflexivity.
- *)  
-
 Theorem nat_to_bin_to_nat: forall n : nat, bin_to_nat (nat_to_bin n) = n.
 Proof.
   induction n.
@@ -535,6 +513,3 @@ Proof.
   rewrite plus_comm.
   reflexivity.
 Qed.
-
-
-
