@@ -282,8 +282,45 @@ Proof.
   reflexivity.
 Qed.
 
-(* Theorem cons_append : forall n : nat, forall l : natlist, cons n l = [n] ++ l.
- *)
+Theorem cons_append : forall n : nat, forall l : natlist, cons n l = [n] ++ l.
+Proof.
+  intros.
+  induction l as [|m k].
+  reflexivity.
+  simpl.
+  reflexivity.
+Qed.
+
+Theorem snoc_append : forall (l:natlist) (n:nat),
+  snoc l n = l ++ [n].
+Proof.
+  intros.
+  induction l as [|m k].
+  reflexivity.
+  simpl.
+  rewrite IHk.
+  reflexivity.
+Qed.
+
+Theorem app_assoc4 : forall l1 l2 l3 l4 : natlist,
+  l1 ++ (l2 ++ (l3 ++ l4)) = ((l1 ++ l2) ++ l3) ++ l4.
+Proof.
+  intros.
+  rewrite app_assoc.
+  rewrite app_assoc.
+  reflexivity.
+Qed.
+
+Theorem rev_injective : forall (l1 l2 : natlist), rev l1 = rev l2 -> l1 = l2.
+Proof.
+  intros.
+  assert (H4: rev (rev l1) = l2).
+    rewrite H.
+    rewrite rev_involutive.
+    reflexivity.
+  rewrite rev_involutive in H4.
+  assumption.
+Qed.
 
 
 
