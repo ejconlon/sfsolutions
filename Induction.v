@@ -154,6 +154,49 @@ Proof.
     reflexivity.
 Qed.
 
+Theorem mult_undist_l : forall m n o: nat, (m * n) + (m * o) = m * (n + o).
+Proof.
+  intros m n o.
+  symmetry.
+  rewrite mult_dist_l.
+  reflexivity.
+Qed.
+
+Theorem mult_1_r: forall m: nat, m * 1 = m.
+Proof.
+  intros m.
+  induction m.
+  rewrite mult_0_l.
+  reflexivity.
+  simpl.
+  rewrite IHm.
+  reflexivity.
+Qed.
+
+Theorem mult_1_l: forall m: nat, 1 * m = m.
+Proof.
+  induction m.
+  rewrite mult_0_r.
+  reflexivity.
+  simpl.
+  rewrite plus_0_r.
+  reflexivity.
+Qed.
+
+Theorem mult_S_dist_r: forall m n : nat, n * (S m) = (n * m) + n.
+Proof.
+  intros m n.
+  symmetry.
+  rewrite plus_comm.
+  assert (H: n + n * m = n * (1 + m)).
+    symmetry.
+    rewrite mult_dist_l.
+    rewrite mult_1_r.
+    reflexivity.
+  rewrite H.
+  reflexivity.
+Qed.
+
 Theorem mult_dist_r : forall m n o: nat, (n + o) * m = (n * m) + (o * m).
 Proof.
   intros m n o.
@@ -164,7 +207,29 @@ Proof.
     rewrite mult_0_r.
     reflexivity.
   Case "m = S m'".
-Admitted.
+    rewrite mult_S_dist_r.
+    rewrite mult_S_dist_r.
+    rewrite IHm'.
+    rewrite plus_assoc.
+    symmetry.
+    rewrite mult_S_dist_r.
+    rewrite plus_assoc.
+    rewrite plus_comm.
+    symmetry.
+    rewrite plus_comm.
+    remember (n * m') as a.
+    remember (o * m') as b.
+    assert (H: a + b + n = a + n + b).
+      rewrite plus_comm.
+      rewrite plus_assoc.
+      assert (H': a + n = n + a).
+        rewrite plus_comm.
+        reflexivity.
+      rewrite H'.
+      reflexivity.
+    rewrite H.
+    reflexivity.
+Qed.
 
 Theorem mult_comm : forall m n : nat,
  m * n = n * m.
@@ -176,7 +241,12 @@ Proof.
     rewrite mult_0_r.
     reflexivity.
   Case "m = S m'".
-Admitted.
+    simpl.
+    rewrite mult_S_dist_r.
+    rewrite plus_comm.
+    rewrite IHm'.
+    reflexivity.
+Qed.
 
 
 
