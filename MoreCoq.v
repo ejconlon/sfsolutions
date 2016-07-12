@@ -191,3 +191,55 @@ Proof.
   apply plus_S_eq.
   assumption.
 Qed.
+
+Lemma s_eq : forall n m, n = m -> S n = S m.
+Proof.
+  intros.
+  inversion H.
+  reflexivity.
+Qed.
+  
+Theorem beq_nat_true : forall n m,
+    beq_nat n m = true -> n = m.
+Proof.
+  induction n as [|n'].
+  intros.
+  destruct m as [|m'].
+  reflexivity.
+  inversion H.
+  destruct m as [|m'].
+  intro H.
+  inversion H.
+  intro H.
+  inversion H.
+  specialize IHn' with m'.
+  apply IHn' in H1.
+  apply s_eq.
+  assumption.
+Qed.
+
+Theorem length_p_1: forall (X : Type) (v : X) (l : list X),
+    length (v :: l) = S (length l).
+Proof.
+  intros X v.
+  destruct l.
+  reflexivity.
+  simpl.
+  reflexivity.
+Qed.  
+
+(*Theorem index_after_last: forall (n : nat) (X : Type) (l : list X),
+   length l = n -> index n l = None.
+Proof.
+  intros n X l.
+  generalize dependent n.
+  induction l as [|v l'].
+  destruct n.
+  reflexivity.
+  reflexivity.
+  intro n.
+  intro H.
+  assert (U: length (v :: l') = S (length l')).
+    apply length_p_1.
+  simpl.
+  *)
